@@ -1,0 +1,6 @@
+.env
+.DS_Store
+test
+node_modules
+backends
+.npmignore

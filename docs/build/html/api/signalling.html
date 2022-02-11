@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rtcpool.signalling &mdash; RTCPool 1.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="rtcpool.pool" href="pool.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> RTCPool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="media.html">rtcpool.media</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">rtcpool.pool</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rtcpool.signalling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#transcievers">Transcievers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#signalling">Signalling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTCPool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+      <li>rtcpool.signalling</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/signalling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rtcpool-signalling">
+<h1>rtcpool.signalling<a class="headerlink" href="#rtcpool-signalling" title="Permalink to this headline"></a></h1>
+<section id="transcievers">
+<h2>Transcievers<a class="headerlink" href="#transcievers" title="Permalink to this headline"></a></h2>
+<p>Transceivers are direct interfaces to a
+sender/receiver. They are simply a way
+to standardize different methods of sending
+and receiving data</p>
+<dl class="js class">
+<dt class="sig sig-object js" id="transceiver">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">transceiver</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#transceiver" title="Permalink to this definition"></a></dt>
+<dd><p>Base class for transceivers.</p>
+<dl class="js function">
+<dt class="sig sig-object js" id="transceiver.close">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">transceiver</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#transceiver.close" title="Permalink to this definition"></a></dt>
+<dd><p>Closes the transceiver.</p>
+</dd></dl>
+
+<dl class="js function">
+<dt class="sig sig-object js" id="transceiver.send">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">transceiver</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transceiver.send" title="Permalink to this definition"></a></dt>
+<dd><p>Sends a message with the given
+type and data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg_type</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The message type.</p></li>
+<li><p><strong>msg_data</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – The message data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="js class">
+<dt class="sig sig-object js" id="sio_transceiver">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">sio_transceiver</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sockio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sio_transceiver" title="Permalink to this definition"></a></dt>
+<dd><p>socket.io transceiver class.</p>
+<p>Create a socket.io transceiver.</p>
+<dl class="js function">
+<dt class="sig sig-object js" id="sio_transceiver.send">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">sio_transceiver</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sio_transceiver.send" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="js class">
+<dt class="sig sig-object js" id="websocket_transceiver">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">websocket_transceiver</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">websocket</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#websocket_transceiver" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="signalling">
+<h2>Signalling<a class="headerlink" href="#signalling" title="Permalink to this headline"></a></h2>
+<p>Signalling classes are the actual signal
+senders/handlers that are used by <a class="reference internal" href="pool.html#Pool" title="Pool"><code class="xref js js-class docutils literal notranslate"><span class="pre">Pool()</span></code></a>
+to negotiate the RTC connections.</p>
+<dl class="js class">
+<dt class="sig sig-object js" id="signalling">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">signalling</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#signalling" title="Permalink to this definition"></a></dt>
+<dd><p>Represents a signalling channel
+through which RTC negotiations occur.</p>
+<p>Create a signalling channel that translates
+raw events to signalling-friendly events
+and sends messages during RTC negotiation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transceiver</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – An object that extends EventTarget, and receives signalling messages from the server which it dispatches as events to itself.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="js class">
+<dt class="sig sig-object js" id="socketio">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">socketio</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#socketio" title="Permalink to this definition"></a></dt>
+<dd><p>socket.io signalling class.</p>
+<p>Create a socketio signalling channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>io</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – The connection returned by io()</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="js class">
+<dt class="sig sig-object js" id="websocket">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">websocket</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#websocket" title="Permalink to this definition"></a></dt>
+<dd><p>Raw WebSocket signalling channel.</p>
+<p>Create a raw WebSocket signalling channel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>socket</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">WebSocket()</span></code></span>) – A WebSocket.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pool.html" class="btn btn-neutral float-left" title="rtcpool.pool" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Isaac Dorenkamp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
