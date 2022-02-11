@@ -1,6 +1,6 @@
 # RTCPool
 ### A JavaScript client library for managing WebRTC connections
-===============================================================
+---------------------------------------------------------------
 
 I'll write more here later :)
 
