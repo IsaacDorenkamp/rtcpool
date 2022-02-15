@@ -65,3 +65,11 @@ are out of the scope of this document; however, the fact that this has
 been implemented can let you rest assured that all your connections will
 not fail to be established (of course, assuming that you have a functional
 TURN/STUN configuration and signalling channel to boot!).
+
+.. note::
+     While previous versions claimed to implement perfect negotiation,
+     rigorous tests later showed otherwise. Now, those rigorous tests
+     have been shown to pass flawlessly, and as long as the TURN/STUN
+     configuration are valid and the signalling channel is reliable,
+     negotiation and re-negotiation should be managed properly 100%
+     of the time.
