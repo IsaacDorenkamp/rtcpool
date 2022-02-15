@@ -1,3 +1,8 @@
+# 1.3.1: February 14, 2022
+
+- Fixed bug causing impolite peer to reject a relevant offer
+- Fixed a buggy call to _apply_candidates with no connection ID
+
 # 1.3.0: February 10, 2022
 
 - Implemented perfect negotiation

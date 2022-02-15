@@ -41,6 +41,7 @@ class Pool {
 		this._descs = {};
 		this._polite = {}; // Tracks politeness of connections
 		this._cand_buffers = {};
+		this._renegotiate = {};
 
 		this._neg_state = {};
 		this._id = null;
@@ -159,6 +160,9 @@ class Pool {
 
 	_create_pc(id) {
 		const conn = new RTCPeerConnection(this._config);
+		for (const medium of this.get_media()) {
+			medium.apply(conn);
+		}
 		conn.addEventListener('icecandidate', (evt) => this._signals.send('rtc:candidate', {
 			'from': this._id,
 			'for': id,
@@ -187,9 +191,6 @@ class Pool {
 		}
 
 		this._conns[id] = conn;
-		for (const medium of this.get_media()) {
-			medium.apply(conn);
-		}
 		return conn;
 	}
 
@@ -214,10 +215,21 @@ class Pool {
 		if (neg_state !== null) {
 			this._neg_state[id] = "restart";
 		} else {
-			this._neg_state[id] = "starting";
-			await conn.setLocalDescription();
+			this._neg_state[id] = "making-offer";
+			const off = await conn.createOffer();
+			// check state again
+			if (this._neg_state[id] === "rollback") {
+				// received offer, rollback
+				delete this._neg_state[id];
+				return;
+			}
+			await conn.setLocalDescription(off);
+			if (this._neg_state[id] === "rollback") {
+				delete this._neg_state[id];
+				return;
+			}
 			this._signals.send('rtc:offers', {
-				[id]: conn.localDescription
+				[id]: off
 			});
 
 			if (this._neg_state[id] == "restart") {
@@ -260,36 +272,65 @@ class Pool {
 
 		const state = this._neg_state[id] || null;
 
+		let rollback = false;
 		if (state !== null) {
+			if (state === "has-answer") {
+				/* this state simply means an answer is being
+				   processed. even if we are impolite, we still
+				   should consider this answer, as it indicates
+				   a change in the negotiated content. this is confirmed
+				   to fix a bug where an offer is ignored because the
+				   impolite peer is busy handling an old answer */
+				this._renegotiate[id] = offer;
+				return;
+			}
+
 			// this endpoint has also created its own offer.
 			// if this endpoint is impolite, it will reject it.
-			const polite = this._polite[offer['for']];
+			const polite = this._polite[id];
 			if (!polite) {
 				// completely ignore the offer
 				return;
+			} else {
+				this._neg_state[id] = "rollback";
+				rollback = state != "making-offer";
 			}
 		}
 
-		await conn.setRemoteDescription(offer.offer);
-		await conn.setLocalDescription();
+		if (rollback) {
+			await Promise.all([
+				conn.setLocalDescription({ type: "rollback" }),
+				conn.setRemoteDescription(offer.offer)
+			]);
+		} else {
+			await conn.setRemoteDescription(offer.offer);
+		}
+		await this._apply_candidates(id); 
+
+		const ans = await conn.createAnswer();
+		await conn.setLocalDescription(ans);
 		this._signals.send('rtc:answer', {
 			'from': this.id,
 			'for': id,
-			'answer': conn.localDescription
+			'answer': ans
 		});
-
-		await this._apply_candidates(id);
 
 		delete this._neg_state[id];
 	}
 
 	async _onanswer(answer) {
 		const conn = answer['for'];
+		this._neg_state[conn] = "has-answer";
 		const conn_for = this._conns[conn];
 		await conn_for.setRemoteDescription(answer.answer);
-		await this._apply_candidates();
-
+		await this._apply_candidates(conn);
 		delete this._neg_state[conn];
+
+		const reneg_offer = this._renegotiate[conn];
+		if (reneg_offer) {
+			delete this._renegotiate[conn];
+			this._onoffer(reneg_offer);
+		}
 	}
 
 	_onclose(close_req) {
@@ -305,12 +346,12 @@ class Pool {
 		}
 	}
 
-	_onicecandidate(data) {
+	async _onicecandidate(data) {
 		const conn = this._conns[data['from']];
 		if (!conn.remoteDescription) {
 			this._put_candidate(data['from'], data.candidate);
 		} else {
-			conn.addIceCandidate(data.candidate);
+			await conn.addIceCandidate(data.candidate);
 		}
 	}
 
