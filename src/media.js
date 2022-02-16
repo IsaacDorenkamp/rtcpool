@@ -14,15 +14,17 @@ function valid_kind(kind) {
  */
 class ManagedStream extends EventTarget {
 	constructor(stream, pool) {
+		super();
 		this._tracks = stream.getTracks();
+		this._senders = {};
 		this._pool = pool;
 
 		const pruner = this._prune.bind(this);
 		this._tracks.forEach(track => track.addEventListener("ended", pruner));
 
-		for (const conn of this._pool.connections) {
+		for (const conn of this._pool._raw_connections) {
 			for (const track of this._tracks) {
-				conn.addTrack(track);
+				this._senders[track.id] = conn.addTrack(track);
 			}
 		}
 
@@ -42,7 +44,7 @@ class ManagedStream extends EventTarget {
 
 	_update_peer(event) {
 		for (const track of this._tracks) {
-			event.detail.connection.addTrack(track);
+			this._senders[track.id] = event.detail.connection.addTrack(track);
 		}
 	}
 
@@ -71,6 +73,16 @@ class ManagedStream extends EventTarget {
 		to_mute.forEach(track => {
 			track.enabled = false;
 		});
+
+		for (const conn of this._pool._raw_connections) {
+			const senders = conn.getSenders();
+			for (const track of to_mute) {
+				const sender = this._senders[track.id];
+				if (senders.includes(sender)) {
+					conn.removeTrack(sender);
+				}
+			}
+		}
 	}
 
 	/**
@@ -87,6 +99,15 @@ class ManagedStream extends EventTarget {
 		to_unmute.forEach(track => {
 			track.enabled = true;
 		});
+
+		for (const conn of this._pool._raw_connections) {
+			const trans = conn.getTransceivers();
+			for (const track of to_unmute) {
+				const sender = trans.find(t => t.sender === this._senders[track.id]);
+				this._senders[track.id].replaceTrack(track);
+				sender.direction = "sendrecv";
+			}
+		}
 	}
 
 	/**
@@ -109,6 +130,15 @@ class ManagedStream extends EventTarget {
 	 */
 	get closed() {
 		return this._tracks.length === 0;
+	}
+
+	/**
+	 * List of tracks in this stream.
+	 * 
+	 * @type {array}
+	 */
+	get tracks() {
+
 	}
 };
 

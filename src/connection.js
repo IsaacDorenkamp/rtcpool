@@ -108,7 +108,7 @@ class ManagedConnection {
 	 * @type {Object}
 	 */
 	get description() {
-		return this._descs[this._id];
+		return this._description[this._id];
 	}
 }
 

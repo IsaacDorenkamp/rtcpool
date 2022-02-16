@@ -321,6 +321,10 @@ class Pool {
 		return Object.values(this._managed);
 	}
 
+	get _raw_connections() {
+		return Object.values(this._conns);
+	}
+
 	/**
 	 * The number of connections open.
 	 * 
