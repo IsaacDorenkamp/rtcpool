@@ -67,9 +67,9 @@ not fail to be established (of course, assuming that you have a functional
 TURN/STUN configuration and signalling channel to boot!).
 
 .. note::
-     While previous versions claimed to implement perfect negotiation,
+     While versions before 1.4.0 claimed to implement perfect negotiation,
      rigorous tests later showed otherwise. Now, those rigorous tests
      have been shown to pass flawlessly, and as long as the TURN/STUN
      configuration are valid and the signalling channel is reliable,
      negotiation and re-negotiation should be managed properly 100%
-     of the time.
+     of the time for versions 1.4.0+.
