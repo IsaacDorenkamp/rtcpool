@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rtcpool.pool" href="pool.html" />
-    <link rel="prev" title="API Reference" href="index.html" /> 
+    <link rel="prev" title="rtcpool.connection" href="connection.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,6 +41,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="connection.html">rtcpool.connection</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rtcpool.media</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">rtcpool.pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="signalling.html">rtcpool.signalling</a></li>
@@ -76,136 +77,55 @@
   <section id="rtcpool-media">
 <h1>rtcpool.media<a class="headerlink" href="#rtcpool-media" title="Permalink to this headline"></a></h1>
 <dl class="js class">
-<dt class="sig sig-object js" id="RTCStream">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">RTCStream</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">med_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RTCStream" title="Permalink to this definition"></a></dt>
-<dd><p>Represents a media stream broadcast to all peers.</p>
-<p>Create an RTCStream.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>med_str</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">MediaStream()</span></code></span>) – The MediaStream to broadcast.</p></li>
-</ul>
-</dd>
-</dl>
+<dt class="sig sig-object js" id="ManagedStream">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">ManagedStream</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream" title="Permalink to this definition"></a></dt>
+<dd><p>A class that automatically manages a
+MediaStream, adding its tracks to all
+existing peers and all peers that connect
+later on. This behavior will continue
+until this ManagedStream is closed or all
+tracks have ended.</p>
 <dl class="js attribute">
-<dt class="sig sig-object js" id="RTCStream.closed">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">RTCStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">closed</span></span></span><a class="headerlink" href="#RTCStream.closed" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object js" id="ManagedStream.closed">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">closed</span></span></span><a class="headerlink" href="#ManagedStream.closed" title="Permalink to this definition"></a></dt>
 <dd><p><strong>type:</strong> Boolean</p>
-<p>Whether this RTCStream is closed.</p>
-</dd></dl>
-
-<dl class="js attribute">
-<dt class="sig sig-object js" id="RTCStream.raw">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">RTCStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">raw</span></span></span><a class="headerlink" href="#RTCStream.raw" title="Permalink to this definition"></a></dt>
-<dd><p><strong>type:</strong> MediaStream</p>
-<p>The underlying <code class="docutils literal notranslate"><span class="pre">MediaStream</span></code> that this class wraps.</p>
-</dd></dl>
-
-<dl class="js attribute">
-<dt class="sig sig-object js" id="RTCStream.tracks">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">RTCStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">tracks</span></span></span><a class="headerlink" href="#RTCStream.tracks" title="Permalink to this definition"></a></dt>
-<dd><p><strong>type:</strong> array</p>
-<p>The array of <code class="docutils literal notranslate"><span class="pre">MediaStreamTrack</span></code> s in the stream.</p>
+<p>Whether this stream is closed.</p>
 </dd></dl>
 
 <dl class="js function">
-<dt class="sig sig-object js" id="RTCStream.apply">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">RTCStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">apply</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rtc_conn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RTCStream.apply" title="Permalink to this definition"></a></dt>
-<dd><p>Applies this medium to a given connection. This is used internally
-by <a class="reference internal" href="pool.html#Pool" title="Pool"><code class="xref js js-class docutils literal notranslate"><span class="pre">Pool()</span></code></a> to automatically add media to peer connections when
-relevant. You do not need to call it yourself, and doing so may
-cause undefined behavior.</p>
+<dt class="sig sig-object js" id="ManagedStream.close">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close the media stream and prevent tracks from being sent to any other peers.</p>
+</dd></dl>
+
+<dl class="js function">
+<dt class="sig sig-object js" id="ManagedStream.mute">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">mute</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.mute" title="Permalink to this definition"></a></dt>
+<dd><p>Mute all or some tracks in the stream.</p>
+<p>If kind is null, all tracks will be muted.
+If kind is ‘video’ or ‘audio’, only tracks
+of the corresponding kind will be muted.</p>
+</dd></dl>
+
+<dl class="js function">
+<dt class="sig sig-object js" id="ManagedStream.muted">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">muted</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.muted" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if a subset of tracks are muted. If kind is null, this checks if all tracks are muted.
+Otherwise, checks if all tracks of the specified kind (‘video’ or ‘audio’) are muted.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rtc_conn</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">RTCPeerConnection()</span></code></span>) – The connection to which to add the MediaStreamTracks.</p></li>
-</ul>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>Boolean</strong> – Whether the specified kind of track is muted (all tracks if kind is null).</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="js function">
-<dt class="sig sig-object js" id="RTCStream.close">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">RTCStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RTCStream.close" title="Permalink to this definition"></a></dt>
-<dd><p>Closes the media stream.</p>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="RTCStream.fromUserMedia">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">RTCStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">fromUserMedia</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RTCStream.fromUserMedia" title="Permalink to this definition"></a></dt>
-<dd><p>Creates an RTC stream from a call to navigator.mediaDevices.getUserMedia.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>constraints</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – The getUserMedia constrains defining the media to be gotten.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>Promise.&lt;RTCStream&gt;</strong> – An RTCStream wrapping the media returned by getUserMedia.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="js class">
-<dt class="sig sig-object js" id="BroadcastDataChannel">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="n"><span class="pre">BroadcastDataChannel</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BroadcastDataChannel" title="Permalink to this definition"></a></dt>
-<dd><p>Represents a data channel broadcast to all peers.</p>
-<p>To create individual channels between endpoints, see <a class="reference internal" href="pool.html#Pool.dataChannel" title="Pool.dataChannel"><code class="xref js js-meth docutils literal notranslate"><span class="pre">Pool.dataChannel()</span></code></a></p>
-<p>Creates a BroadcastDataChannel with the given
-label and options.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The label to be assigned to the data channels.</p></li>
-<li><p><strong>options</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – The RTCDataChannel options to create channels with.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="js attribute">
-<dt class="sig sig-object js" id="BroadcastDataChannel.closed">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">BroadcastDataChannel</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">closed</span></span></span><a class="headerlink" href="#BroadcastDataChannel.closed" title="Permalink to this definition"></a></dt>
-<dd><p><strong>type:</strong> Boolean</p>
-<p>Whether this BroadcastDataChannel is closed.</p>
-</dd></dl>
-
-<dl class="js attribute">
-<dt class="sig sig-object js" id="BroadcastDataChannel.events">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">BroadcastDataChannel</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">events</span></span></span><a class="headerlink" href="#BroadcastDataChannel.events" title="Permalink to this definition"></a></dt>
-<dd><p><strong>type:</strong> EventTarget</p>
-<p>The interface for all events triggered a
-data channel managed by this class.</p>
-<p>Manages all standard events for RTCDataChannel.</p>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="BroadcastDataChannel.apply">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">BroadcastDataChannel</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">apply</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rtc_conn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BroadcastDataChannel.apply" title="Permalink to this definition"></a></dt>
-<dd><p>Applies this medium to a given connection. This is used internally
-by <a class="reference internal" href="pool.html#Pool" title="Pool"><code class="xref js js-class docutils literal notranslate"><span class="pre">Pool()</span></code></a> to automatically add media to peer connections when
-relevant. You do not need to call it yourself, and doing so may
-cause undefined behavior.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rtc_conn</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">RTCPeerConnection()</span></code></span>) – The connection to create a data channel for.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="BroadcastDataChannel.close">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">BroadcastDataChannel</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#BroadcastDataChannel.close" title="Permalink to this definition"></a></dt>
-<dd><p>Close all data channels open, and mark this
-broadcast channel as closed.</p>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="BroadcastDataChannel.send">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">BroadcastDataChannel</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">send</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BroadcastDataChannel.send" title="Permalink to this definition"></a></dt>
-<dd><p>Send the provided data through all open channels.</p>
+<dt class="sig sig-object js" id="ManagedStream.unmute">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">unmute</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.unmute" title="Permalink to this definition"></a></dt>
+<dd><p>Unmute all or some tracks in the stream.</p>
+<p>If kind is null, all tracks will be unmuted.
+If kind is ‘video’ or ‘audio’, only tracks
+of the corresponding kind will be unmuted.</p>
 </dd></dl>
 
 </dd></dl>
@@ -216,7 +136,7 @@ broadcast channel as closed.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="connection.html" class="btn btn-neutral float-left" title="rtcpool.connection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pool.html" class="btn btn-neutral float-right" title="rtcpool.pool" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

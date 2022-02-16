@@ -41,6 +41,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="connection.html">rtcpool.connection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="media.html">rtcpool.media</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rtcpool.pool</a></li>
 <li class="toctree-l2"><a class="reference internal" href="signalling.html">rtcpool.signalling</a></li>
@@ -96,8 +97,7 @@ and data channels without directly interacting with them.</p>
 <dt class="sig sig-object js" id="Pool.connections">
 <span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">connections</span></span></span><a class="headerlink" href="#Pool.connections" title="Permalink to this definition"></a></dt>
 <dd><p><strong>type:</strong> array</p>
-<p>A list of all RTCPeerConnections, each with an additional ‘uid’ attribute
-representing the ID of the endpoint that it is connected to.</p>
+<p>A list of every <a class="reference internal" href="connection.html#ManagedConnection" title="ManagedConnection"><code class="xref js js-class docutils literal notranslate"><span class="pre">ManagedConnection()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="js attribute">
@@ -124,34 +124,6 @@ EventTarget are ‘join’, ‘close’, and ‘describe.’</p>
 </dd></dl>
 
 <dl class="js function">
-<dt class="sig sig-object js" id="Pool.add_media">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">add_media</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">medium</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.add_media" title="Permalink to this definition"></a></dt>
-<dd><p>Add media which will be streamed/opened on all peers, current and future.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>medium</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">RTCStream|BroadcastDataChannel()</span></code></span>) – An object representing media to be broadcast.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="Pool.broadcastDataChannel">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">broadcastDataChannel</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.broadcastDataChannel" title="Permalink to this definition"></a></dt>
-<dd><p>Creates an object representing a broadcast data channel. It will open
-a data channel with all existing peers, and any future peers that join.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The label to assign to the data channel(s) that are created.</p></li>
-<li><p><strong>options</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – The RTCDataChannel options to create the channel with.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="js function">
 <dt class="sig sig-object js" id="Pool.close">
 <span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evt_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.close" title="Permalink to this definition"></a></dt>
 <dd><p>Closes all connections, as well as the signalling channel.
@@ -159,64 +131,17 @@ Causes a ‘close’ event to be dispatched to {this.events}</p>
 </dd></dl>
 
 <dl class="js function">
-<dt class="sig sig-object js" id="Pool.dataChannel">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">dataChannel</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.dataChannel" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a one-to-one data channel with the endpoint identified
-by conn_id with the given label and options.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>conn_id</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The ID of the connection to create a data channel for.</p></li>
-<li><p><strong>label</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The label to assign to the data channel.</p></li>
-<li><p><strong>options</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Object()</span></code></span>) – The RTCDataChannel options to create the channel with.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>RTCDataChannel|null</strong> – - An RTCDataChannel to the desired endpoint, or null if the connection doesn’t exist.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="Pool.get_connection">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_connection</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.get_connection" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object js" id="Pool.getConnection">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">getConnection</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.getConnection" title="Permalink to this definition"></a></dt>
 <dd><p>Gets the RTCPeerConnection associated with the specified endpoint.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Arguments</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>uid</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The ID of the endpoint connection to get.</p></li>
+<li><p><strong>id</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The ID of the endpoint connection to get.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>RTCPeerConnection|null</strong> – The RTCPeerConnection to the desired endpoint, or null if it does not exist.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="Pool.get_description">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_description</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Pool.get_description" title="Permalink to this definition"></a></dt>
-<dd><p>Gets the description associated with the specified endpoint.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>uid</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The ID of the endpoint whose description to get.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>Object|null|undefined</strong> – The description of the endpoint, null if the description is null, and undefined if the endpoint does not exist.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="js function">
-<dt class="sig sig-object js" id="Pool.get_media">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">Pool</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">get_media</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Pool.get_media" title="Permalink to this definition"></a></dt>
-<dd><p>Internally recalculates which media should be retained, and returns the list of media.
-Media which are removed are those which have been closed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>array</strong> – The list of media currently being broadcast by this endpoint.</p>
+<dd class="field-even"><p><strong>ManagedConnection|null</strong> – The <a class="reference internal" href="connection.html#ManagedConnection" title="ManagedConnection"><code class="xref js js-class docutils literal notranslate"><span class="pre">ManagedConnection()</span></code></a> to the desired endpoint, or null if it does not exist.</p>
 </dd>
 </dl>
 </dd></dl>

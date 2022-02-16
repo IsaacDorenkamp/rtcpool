@@ -1,8 +1,5 @@
 rtcpool.media
 =============
 
-.. autoclass:: RTCStream
-	:members:
-
-.. autoclass:: BroadcastDataChannel
+.. autoclass:: ManagedStream
 	:members:

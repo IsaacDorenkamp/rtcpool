@@ -1,5 +1,6 @@
 const util = require('./util');
 const media = require('./media');
+const { ManagedConnection } = require('./connection');
 
 /**
  * A pool of WebRTC connections. All negotiations
@@ -38,15 +39,14 @@ class Pool {
 		);
 
 		this._conns = {};
+		this._managed = {};
 		this._descs = {};
 		this._polite = {}; // Tracks politeness of connections
 		this._cand_buffers = {};
-		this._lock_answer = [];
+		this._lock_answer = {};
 		this._renegotiate = {};
 
 		this._id = null;
-
-		this._media = [];
 
 		this._signals.onrequest = this._onrequest.bind(this);
 		this._signals.onoffer = this._onoffer.bind(this);
@@ -58,30 +58,6 @@ class Pool {
 		this._signals.ondescribe = this._describe.bind(this);
 
 		this.events = util.withon(new EventTarget(), ['join', 'close', 'describe']);
-	}
-
-	/**
-	 * Add media which will be streamed/opened on all peers, current and future.
-	 * 
-	 * @param {RTCStream|BroadcastDataChannel} medium - An object representing media to be broadcast.
-	 */
-	add_media(medium) {
-		for (const conn of Object.values(this._conns)) {
-			medium.apply(conn);
-		}
-
-		this._media.push(medium);
-	}
-
-	/**
-	 * Internally recalculates which media should be retained, and returns the list of media.
-	 * Media which are removed are those which have been closed.
-	 * 
-	 * @return {array} The list of media currently being broadcast by this endpoint.
-	 */
-	get_media() {
-		this._media = this._media.filter(medium => !medium.closed);
-		return this._media;
 	}
 
 	/**
@@ -127,42 +103,8 @@ class Pool {
 		}))
 	}
 
-	/**
-	 * Creates a one-to-one data channel with the endpoint identified
-	 * by conn_id with the given label and options.
-	 * 
-	 * @param {string} conn_id - The ID of the connection to create a data channel for.
-	 * @param {string} label - The label to assign to the data channel.
-	 * @param {Object} options - The RTCDataChannel options to create the channel with.
-	 * @return {RTCDataChannel|null} - An RTCDataChannel to the desired endpoint, or null if the connection doesn't exist.
-	 */
-	dataChannel(conn_id, label, options={}) {
-		const pc = this._conns[conn_id];
-		if (pc) {
-			return pc.createDataChannel(label, options);
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Creates an object representing a broadcast data channel. It will open
-	 * a data channel with all existing peers, and any future peers that join.
-	 * 
-	 * @param {string} label - The label to assign to the data channel(s) that are created.
-	 * @param {Object} options - The RTCDataChannel options to create the channel with.
-	 */
-	broadcastDataChannel(label, options={}) {
-		const bdc = new media.BroadcastDataChannel(label, options);
-		this.add_media(bdc);
-		return bdc;
-	}
-
 	_create_pc(id) {
 		const conn = new RTCPeerConnection(this._config);
-		for (const medium of this.get_media()) {
-			medium.apply(conn);
-		}
 		conn.addEventListener('icecandidate', (evt) => this._signals.send('rtc:candidate', {
 			'from': this._id,
 			'for': id,
@@ -191,6 +133,17 @@ class Pool {
 		}
 
 		this._conns[id] = conn;
+		let managed = new ManagedConnection(conn, id, this._descs);
+		this._managed[id] = managed;
+
+		// Good to dispatch before whatever happens next,
+		// especially if adding media in listener(s)
+		this.events.dispatchEvent(new CustomEvent('peer', {
+			detail: {
+				connection: managed
+			}
+		}));
+
 		return conn;
 	}
 
@@ -264,8 +217,6 @@ class Pool {
 			return;
 		}
 
-		console.log("Received offer:", offer);
-
 		await conn.setRemoteDescription(offer.offer);
 		await this._apply_candidates(id);
 
@@ -300,8 +251,12 @@ class Pool {
 				'detail': util.withattrs(conn, { 'id': close_req.uid })
 			}));
 			delete this._conns[close_req.uid];
+			delete this._managed[close_req.uid];
 			delete this._descs[close_req.uid];
 			delete this._polite[close_req.uid];
+			delete this._cand_buffers[close_req.uid];
+			delete this._lock_answer[close_req.uid];
+			delete this._renegotiate[close_req.uid];
 		}
 	}
 
@@ -340,22 +295,12 @@ class Pool {
 	/**
 	 * Gets the RTCPeerConnection associated with the specified endpoint.
 	 * 
-	 * @param {string} uid - The ID of the endpoint connection to get.
-	 * @return {RTCPeerConnection|null} The RTCPeerConnection to the desired
+	 * @param {string} id - The ID of the endpoint connection to get.
+	 * @return {ManagedConnection | null} The :class:`ManagedConnection` to the desired
 	 *         endpoint, or null if it does not exist.
 	 */
-	get_connection(uid) {
-		return this._conns[uid] || null;
-	}
-
-	/**
-	 * Gets the description associated with the specified endpoint.
-	 * 
-	 * @param {string} uid - The ID of the endpoint whose description to get.
-	 * @return {Object|null|undefined} The description of the endpoint, null if the description is null, and undefined if the endpoint does not exist.
-	 */
-	get_description(uid) {
-		return this._descs[uid];
+	getConnection(id) {
+		return this._managed[id] || null;
 	}
 
 	/**
@@ -368,15 +313,12 @@ class Pool {
 	}
 
 	/**
-	 * A list of all RTCPeerConnections, each with an additional 'uid' attribute
-	 * representing the ID of the endpoint that it is connected to.
+	 * A list of every :class:`ManagedConnection`.
 	 * 
 	 * @type {array}
 	 */
 	get connections() {
-		return Object.entries(this._conns).map(entry => util.withattrs(entry[1], {
-			'uid': entry[0]
-		}));
+		return Object.values(this._managed);
 	}
 
 	/**
