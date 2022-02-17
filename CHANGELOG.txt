@@ -1,3 +1,15 @@
+# 2.1.9: February 16, 2022
+- Actually implemented first feature detailed in
+  2.1.8 entry (edited code in wrong location).
+- Added various helper methods for interacting with
+  individual MediaStream objects.
+
+# 2.1.8: February 16, 2022
+- ManagedStream now creates a new MediaStream for each
+  peer, as is intended (instead of passing the passed-in
+  stream as before)
+- Added "...streams" to addTrack in ManagedConnection
+
 # 2.1.7: February 16, 2022
 - The MediaStream passed into ManagedStream is now passed
   into all calls to addTrack, so that tracks may be

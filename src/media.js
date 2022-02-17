@@ -15,7 +15,7 @@ function valid_kind(kind) {
 class ManagedStream extends EventTarget {
 	constructor(stream, pool) {
 		super();
-		this._stream = stream;
+		this._streams = {};
 		this._tracks = stream.getTracks();
 		this._senders = {};
 		this._pool = pool;
@@ -23,9 +23,11 @@ class ManagedStream extends EventTarget {
 		const pruner = this._prune.bind(this);
 		this._tracks.forEach(track => track.addEventListener("ended", pruner));
 
-		for (const conn of this._pool._raw_connections) {
+		for (const conn of this._pool.connections) {
+			let cstream = new MediaStream();
+			this._streams[conn.id] = new MediaStream();
 			for (const track of this._tracks) {
-				this._senders[track.id] = conn.addTrack(track, stream);
+				this._senders[track.id] = conn.addTrack(track, cstream);
 			}
 		}
 
@@ -44,8 +46,11 @@ class ManagedStream extends EventTarget {
 	}
 
 	_update_peer(event) {
+		const conn = event.detail.connection;
+		const cstream = new MediaStream();
+		this._streams[conn.id] = cstream;
 		for (const track of this._tracks) {
-			this._senders[track.id] = event.detail.connection.addTrack(track, this._stream);
+			this._senders[track.id] = event.detail.connection.addTrack(track, cstream);
 		}
 	}
 
@@ -125,6 +130,45 @@ class ManagedStream extends EventTarget {
 	}
 
 	/**
+	 * Check if this ManagedStream has a MediaStream with the specified ID.
+	 * 
+	 * @param {string} The ID to check for.
+	 * 
+	 * @return {Boolean} true if the stream is found, false otherwise
+	 */
+	hasStream(id) {
+		return Object.values(this._streams).some(stream => stream.id === id);
+	}
+
+	/**
+	 * Get the MediaStream associated with the given connection ID.
+	 * 
+	 * @param {string} conn_id - The ID of the connection to get the MediaStream for.
+	 * 
+	 * @return {MediaStream} The MediaStream associated with the specified connection.
+	 */
+	getStream(conn_id) {
+		return this._streams[conn_id];
+	}
+
+	/**
+	 * Gets a connection by the ID of the MediaStream associated with it.
+	 * 
+	 * @param {string} stream_id - The stream to get the connection for.
+	 * 
+	 * @return {ManagedConnection} The associated connection.
+	 */
+	getConnection(stream_id) {
+		for (const entry of Object.entries(this._streams)) {
+			if (entry[1].id === stream_id) {
+				return this._pool.getConnection(entry[0]);
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Whether this stream is closed.
 	 * 
 	 * @type {Boolean}
@@ -139,7 +183,7 @@ class ManagedStream extends EventTarget {
 	 * @type {array}
 	 */
 	get tracks() {
-		return this._stream.getTracks();
+		return this._tracks.filter(e => true);
 	}
 };
 

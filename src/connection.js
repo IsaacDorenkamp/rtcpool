@@ -80,8 +80,8 @@ class ManagedConnection {
 	/**
 	 * A proxy for RTCPeerConnection.addTrack
 	 */
-	addTrack(track) {
-		return this._conn.addTrack(track);
+	addTrack(track, ...streams) {
+		return this._conn.addTrack(track, ...streams);
 	}
 
 	/**
