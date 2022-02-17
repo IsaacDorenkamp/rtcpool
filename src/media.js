@@ -25,7 +25,7 @@ class ManagedStream extends EventTarget {
 
 		for (const conn of this._pool.connections) {
 			let cstream = new MediaStream();
-			this._streams[conn.id] = new MediaStream();
+			this._streams[conn.id] = cstream;
 			for (const track of this._tracks) {
 				this._senders[track.id] = conn.addTrack(track, cstream);
 			}
