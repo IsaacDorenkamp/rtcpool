@@ -1,3 +1,10 @@
+# 2.1.7: February 16, 2022
+- The MediaStream passed into ManagedStream is now passed
+  into all calls to addTrack, so that tracks may be
+  identified by the stream they are a part of over the
+  peer connection
+- Fixed empty tracks getter in ManagedStream
+
 # 2.1.6: February 16, 2022
 - Muting/Unmuting fixed
 

@@ -15,6 +15,7 @@ function valid_kind(kind) {
 class ManagedStream extends EventTarget {
 	constructor(stream, pool) {
 		super();
+		this._stream = stream;
 		this._tracks = stream.getTracks();
 		this._senders = {};
 		this._pool = pool;
@@ -24,7 +25,7 @@ class ManagedStream extends EventTarget {
 
 		for (const conn of this._pool._raw_connections) {
 			for (const track of this._tracks) {
-				this._senders[track.id] = conn.addTrack(track);
+				this._senders[track.id] = conn.addTrack(track, stream);
 			}
 		}
 
@@ -44,7 +45,7 @@ class ManagedStream extends EventTarget {
 
 	_update_peer(event) {
 		for (const track of this._tracks) {
-			this._senders[track.id] = event.detail.connection.addTrack(track);
+			this._senders[track.id] = event.detail.connection.addTrack(track, this._stream);
 		}
 	}
 
@@ -138,7 +139,7 @@ class ManagedStream extends EventTarget {
 	 * @type {array}
 	 */
 	get tracks() {
-
+		return this._stream.getTracks();
 	}
 };
 
