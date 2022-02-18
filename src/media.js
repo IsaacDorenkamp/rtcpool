@@ -13,31 +13,38 @@ function valid_kind(kind) {
  * tracks have ended.
  */
 class ManagedStream extends EventTarget {
+	#streams;
+	#tracks;
+	#senders;
+	#pool;
+
+	#bound_updater;
+
 	constructor(stream, pool) {
 		super();
-		this._streams = {};
-		this._tracks = stream.getTracks();
-		this._senders = {};
-		this._pool = pool;
+		this.#streams = {};
+		this.#tracks = stream.getTracks();
+		this.#senders = {};
+		this.#pool = pool;
 
-		const pruner = this._prune.bind(this);
-		this._tracks.forEach(track => track.addEventListener("ended", pruner));
+		const pruner = this.#prune.bind(this);
+		this.#tracks.forEach(track => track.addEventListener("ended", pruner));
 
-		for (const conn of this._pool.connections) {
+		for (const conn of this.#pool.connections) {
 			let cstream = new MediaStream();
-			this._streams[conn.id] = cstream;
-			for (const track of this._tracks) {
-				this._senders[track.id] = conn.addTrack(track, cstream);
+			this.#streams[conn.id] = cstream;
+			for (const track of this.#tracks) {
+				this.#senders[track.id] = conn.addTrack(track, cstream);
 			}
 		}
 
-		this._bound_updater = this._update_peer.bind(this);
+		this.#bound_updater = this.#update_peer.bind(this);
 
-		this._pool.events.addEventListener("peer", this._bound_updater);
+		this.#pool.events.addEventListener("peer", this.#bound_updater);
 	}
 
-	_prune() {
-		this._tracks = this._tracks.filter(track => track.readyState !== "ended");
+	#prune() {
+		this.#tracks = this.#tracks.filter(track => track.readyState !== "ended");
 		if (this.closed) {
 			this.dispatchEvent(new CustomEvent('close', {
 				target: this
@@ -45,12 +52,12 @@ class ManagedStream extends EventTarget {
 		}
 	}
 
-	_update_peer(event) {
+	#update_peer(event) {
 		const conn = event.detail.connection;
 		const cstream = new MediaStream();
-		this._streams[conn.id] = cstream;
-		for (const track of this._tracks) {
-			this._senders[track.id] = event.detail.connection.addTrack(track, cstream);
+		this.#streams[conn.id] = cstream;
+		for (const track of this.#tracks) {
+			this.#senders[track.id] = event.detail.connection.addTrack(track, cstream);
 		}
 	}
 
@@ -58,11 +65,11 @@ class ManagedStream extends EventTarget {
 	 * Close the media stream and prevent tracks from being sent to any other peers.
 	 */
 	close() {
-		this._pool.events.removeEventListener("peer", this._bound_updater);
-		for (const track of this._tracks) {
+		this.#pool.events.removeEventListener("peer", this.#bound_updater);
+		for (const track of this.#tracks) {
 			track.stop();
 		}
-		this._tracks = [];
+		this.#tracks = [];
 	}
 
 	/**
@@ -71,19 +78,21 @@ class ManagedStream extends EventTarget {
 	 * If kind is null, all tracks will be muted.
 	 * If kind is 'video' or 'audio', only tracks
 	 * of the corresponding kind will be muted.
+	 * 
+	 * @param {string} kind - The kind of track to mute.
 	 */
 	mute(kind=null) {
 		valid_kind(kind);
-		let to_mute = this._tracks;
+		let to_mute = this.#tracks;
 		if (kind) to_mute = to_mute.filter(track => track.kind === kind);
 		to_mute.forEach(track => {
 			track.enabled = false;
 		});
 
-		for (const conn of this._pool._raw_connections) {
+		for (const conn of this.#pool._raw_connections) {
 			const senders = conn.getSenders();
 			for (const track of to_mute) {
-				const sender = this._senders[track.id];
+				const sender = this.#senders[track.id];
 				if (senders.includes(sender)) {
 					conn.removeTrack(sender);
 				}
@@ -97,20 +106,22 @@ class ManagedStream extends EventTarget {
 	 * If kind is null, all tracks will be unmuted.
 	 * If kind is 'video' or 'audio', only tracks
 	 * of the corresponding kind will be unmuted.
+	 * 
+	 * @param {string} kind - The kind of track to unmute.
 	 */
 	unmute(kind=null) {
 		valid_kind(kind);
-		let to_unmute = this._tracks;
+		let to_unmute = this.#tracks;
 		if (kind) to_unmute = to_unmute.filter(track => track.kind === kind);
 		to_unmute.forEach(track => {
 			track.enabled = true;
 		});
 
-		for (const conn of this._pool._raw_connections) {
+		for (const conn of this.#pool._raw_connections) {
 			const trans = conn.getTransceivers();
 			for (const track of to_unmute) {
-				const sender = trans.find(t => t.sender === this._senders[track.id]);
-				this._senders[track.id].replaceTrack(track);
+				const sender = trans.find(t => t.sender === this.#senders[track.id]);
+				this.#senders[track.id].replaceTrack(track);
 				sender.direction = "sendrecv";
 			}
 		}
@@ -120,11 +131,13 @@ class ManagedStream extends EventTarget {
 	 * Checks if a subset of tracks are muted. If kind is null, this checks if all tracks are muted.
 	 * Otherwise, checks if all tracks of the specified kind ('video' or 'audio') are muted.
 	 * 
+	 * @param {string} kind - The kind of track to check the muted state of.
+	 * 
 	 * @return {Boolean} Whether the specified kind of track is muted (all tracks if kind is null).
 	 */
 	muted(kind=null) {
 		valid_kind(kind);
-		let check = this._tracks;
+		let check = this.#tracks;
 		if (kind) check = check.filter(track => track.kind === kind);
 		return check.every(track => track.enabled);
 	}
@@ -132,12 +145,12 @@ class ManagedStream extends EventTarget {
 	/**
 	 * Check if this ManagedStream has a MediaStream with the specified ID.
 	 * 
-	 * @param {string} The ID to check for.
+	 * @param {string} id - The ID to check for.
 	 * 
 	 * @return {Boolean} true if the stream is found, false otherwise
 	 */
 	hasStream(id) {
-		return Object.values(this._streams).some(stream => stream.id === id);
+		return Object.values(this.#streams).some(stream => stream.id === id);
 	}
 
 	/**
@@ -148,7 +161,7 @@ class ManagedStream extends EventTarget {
 	 * @return {MediaStream} The MediaStream associated with the specified connection.
 	 */
 	getStream(conn_id) {
-		return this._streams[conn_id];
+		return this.#streams[conn_id];
 	}
 
 	/**
@@ -159,9 +172,9 @@ class ManagedStream extends EventTarget {
 	 * @return {ManagedConnection} The associated connection.
 	 */
 	getConnection(stream_id) {
-		for (const entry of Object.entries(this._streams)) {
+		for (const entry of Object.entries(this.#streams)) {
 			if (entry[1].id === stream_id) {
-				return this._pool.getConnection(entry[0]);
+				return this.#pool.getConnection(entry[0]);
 			}
 		}
 
@@ -174,7 +187,7 @@ class ManagedStream extends EventTarget {
 	 * @type {Boolean}
 	 */
 	get closed() {
-		return this._tracks.length === 0;
+		return this.#tracks.length === 0;
 	}
 
 	/**
@@ -183,7 +196,7 @@ class ManagedStream extends EventTarget {
 	 * @type {array}
 	 */
 	get tracks() {
-		return this._tracks.filter(e => true);
+		return this.#tracks.filter(e => true);
 	}
 };
 

@@ -39,7 +39,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/index.html">Understanding RTCPool</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="connection.html">rtcpool.connection</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rtcpool.media</a></li>
@@ -106,33 +106,100 @@ tracks have ended.</p>
 </dd></dl>
 
 <dl class="js function">
+<dt class="sig sig-object js" id="ManagedStream.getConnection">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">getConnection</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.getConnection" title="Permalink to this definition"></a></dt>
+<dd><p>Gets a connection by the ID of the MediaStream associated with it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream_id</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The stream to get the connection for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ManagedConnection</strong> – The associated connection.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="js function">
+<dt class="sig sig-object js" id="ManagedStream.getStream">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">getStream</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.getStream" title="Permalink to this definition"></a></dt>
+<dd><p>Get the MediaStream associated with the given connection ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conn_id</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The ID of the connection to get the MediaStream for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>MediaStream</strong> – The MediaStream associated with the specified connection.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="js function">
+<dt class="sig sig-object js" id="ManagedStream.hasStream">
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">hasStream</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.hasStream" title="Permalink to this definition"></a></dt>
+<dd><p>Check if this ManagedStream has a MediaStream with the specified ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The ID to check for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Boolean</strong> – true if the stream is found, false otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="js function">
 <dt class="sig sig-object js" id="ManagedStream.mute">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">mute</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.mute" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">mute</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind=&quot;null&quot;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.mute" title="Permalink to this definition"></a></dt>
 <dd><p>Mute all or some tracks in the stream.</p>
 <p>If kind is null, all tracks will be muted.
 If kind is ‘video’ or ‘audio’, only tracks
 of the corresponding kind will be muted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kind</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The kind of track to mute.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="js function">
 <dt class="sig sig-object js" id="ManagedStream.muted">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">muted</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.muted" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">muted</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind=&quot;null&quot;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.muted" title="Permalink to this definition"></a></dt>
 <dd><p>Checks if a subset of tracks are muted. If kind is null, this checks if all tracks are muted.
 Otherwise, checks if all tracks of the specified kind (‘video’ or ‘audio’) are muted.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>Boolean</strong> – Whether the specified kind of track is muted (all tracks if kind is null).</p>
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kind</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The kind of track to check the muted state of.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>Boolean</strong> – Whether the specified kind of track is muted (all tracks if kind is null).</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="js function">
 <dt class="sig sig-object js" id="ManagedStream.unmute">
-<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">unmute</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.unmute" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="n"><span class="pre">ManagedStream</span></span><span class="p"><span class="pre">.</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">unmute</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind=&quot;null&quot;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ManagedStream.unmute" title="Permalink to this definition"></a></dt>
 <dd><p>Unmute all or some tracks in the stream.</p>
 <p>If kind is null, all tracks will be unmuted.
 If kind is ‘video’ or ‘audio’, only tracks
 of the corresponding kind will be unmuted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Arguments</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kind</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">string()</span></code></span>) – The kind of track to unmute.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

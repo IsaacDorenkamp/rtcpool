@@ -14,6 +14,8 @@ have actually been negotiated, individual endpoints are made aware
 of their peers and know who to send offers to when appropriate. A
 single pool might be a video chat room, for instance.
 
+.. _descriptions:
+
 Descriptions
 ------------
 RTCPool implements a system whereby connections can be associated
@@ -28,34 +30,15 @@ Signalling
 A signalling channel is simply an object that sends and receives
 RTC negotiation messages. How it sends them is unimportant, but
 they are sent via a ``send(message_type, message_data)`` method.
-Likewise, how it receives them is unimportant. A signalling class
-should be a subclass of ``EventTarget``, and when it receives an
-event from the server, it dispatches an event to itself.
-The event names are mapped accordingly:
+Likewise, how it receives them is unimportant. RTCPool has built-in
+support for socket.io and raw WebSockets as signalling channels, but
+you may implement your own by extending :class:`transceiver` and ensuring
+the following:
 
-====================   ========================
-Received From Server   Type of event dispatched
-====================   ========================
-     rtc:joined                 join
-     rtc:describe              describe
- rtc:request_offers            request
-      rtc:offer                 offer
-      rtc:answer                answer
-      rtc:close                 close
-     rtc:candidate            candidate
-       rtc:stop                  stop
-====================   ========================
-
-RTCPool has built in support for raw WebSocket signalling and
-socket.io signalling, but you can build your own signalling class
-by creating a class which functions as described above.
-
-To simplify things, the :class:`signalling` automatically handles
-the event mapping. All you must do is extend :class:`transceiver`,
-and then you can create a signalling instance with something like
-the below::
-
-	const signalling = new rtcpool.signalling(new MyTransceiver());
+- Implement a ``send`` method that accepts a message type and data as a JSON object.
+- Implement code that passively listens for data from the signalling channel,
+  and when an event is available, dispatches the event to ``this`` (since
+  :class:`transceiver` extends EventTarget)
 
 Perfect Negotiation
 -------------------
@@ -67,9 +50,13 @@ not fail to be established (of course, assuming that you have a functional
 TURN/STUN configuration and signalling channel to boot!).
 
 .. note::
-     While versions before 1.4.0 claimed to implement perfect negotiation,
-     rigorous tests later showed otherwise. Now, those rigorous tests
-     have been shown to pass flawlessly, and as long as the TURN/STUN
-     configuration are valid and the signalling channel is reliable,
-     negotiation and re-negotiation should be managed properly 100%
-     of the time for versions 1.4.0+.
+     All versions pre-3.0.0 have some negotiation failure cases.
+     Each successive version improved upon the shortcomings of the
+     previous one, but true perfect negotiation was not achieved until
+     version 3.0.0 with a complete rewrite of the internal negotiation
+     process.
+
+Managed Connection
+------------------
+The primary purpose of RTCPool is to simplify the use of the WebRTC API.
+As such, negotiation is completely abstracted away and handled internally.

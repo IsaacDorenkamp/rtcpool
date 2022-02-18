@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signalling Protocol &mdash; RTCPool 1.3.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api/index.html" />
+    <link rel="prev" title="Concepts" href="concepts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> RTCPool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Signalling Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#differences-from-v1">Differences from v1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RTCPool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Signalling Protocol</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/protocol.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="signalling-protocol">
+<h1>Signalling Protocol<a class="headerlink" href="#signalling-protocol" title="Permalink to this headline"></a></h1>
+<p>RTCPool uses a custom designed signalling protocol intended
+to be a standard for managing pools of WebRTC connections.
+My other project, <a class="reference external" href="https://github.com/IsaacDorenkamp/PyRTC">PyRTC</a>,
+implements this signalling protocol and is maintained alongside
+RTCPool, so any breaking changes to the protocol are kept up to
+date between both projects consistently.</p>
+<p>The protocol, named ssp (Sdp Signalling Protocol), has two versions.
+All versions of RTCPool &lt;3.0.0 use v1, while 3.0.0+ use v2. I will
+detail the signalling events of v2 here and then explain the differences
+with v1 and why they were made. ssp is based on events, which have a
+type (string) and data (JSON object). The events are as follows:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 14%" />
+<col style="width: 24%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Event Type</p></th>
+<th class="head"><p>Received By</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Event Data</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>rtc:join</p></td>
+<td><p>Server</p></td>
+<td><p>Used to join a pool.</p></td>
+<td><ul class="simple">
+<li><p>pool: The unique ID of the pool to join.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>rtc:joined</p></td>
+<td><p>Client</p></td>
+<td><p>Notifies the client that
+they have successfully
+joined the pool.</p></td>
+<td><ul class="simple">
+<li><p>client_id: The unique ID assigned to this client.</p></li>
+<li><p>peers: An array of unique IDs corresponding to
+the other peers in this pool.</p></li>
+<li><p>descriptions: A map whose keys are peer IDs and
+whose values are the JSON descriptions of those
+peers.</p></li>
+<li><p>pool: The ID of the pool joined.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>rtc:sdp</p></td>
+<td><p>Server</p></td>
+<td><p>Used to relay an SDP
+description to another
+peer.</p></td>
+<td><ul class="simple">
+<li><p>to: The unique ID of the peer to send to.</p></li>
+<li><p>description: The SDP description object.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>rtc:sdp</p></td>
+<td><p>Client</p></td>
+<td><p>The SDP description of
+another peer.</p></td>
+<td><ul class="simple">
+<li><p>peer: The unique ID of the peer sending the SDP.</p></li>
+<li><p>description: The SDP description object.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>rtc:candidate</p></td>
+<td><p>Server</p></td>
+<td><p>Used to relay an ICE
+candidate to another
+peer.</p></td>
+<td><ul class="simple">
+<li><p>for: The unique ID of the peer which should
+receive the ICE candidate.</p></li>
+<li><p>candidate: The ICE candidate object.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>rtc:candidate</p></td>
+<td><p>Client</p></td>
+<td><p>An ICE candidate sent by
+another peer during
+negotiation.</p></td>
+<td><ul class="simple">
+<li><p>from: Then unique ID of the peer who sent the
+ICE candidate.</p></li>
+<li><p>candidate: The ICE candidate object.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>rtc:peer</p></td>
+<td><p>Client</p></td>
+<td><p>Sent by the server to
+notify existing peers
+when a new peer joins.</p></td>
+<td><ul class="simple">
+<li><p>id: The unique ID of the peer that has joined.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>rtc:close</p></td>
+<td><p>Client</p></td>
+<td><p>Sent by the server to
+notify peers when a
+peer has left/closed.</p></td>
+<td><ul class="simple">
+<li><p>id: The unique ID of the peer that has left.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>rtc:stop</p></td>
+<td><p>Client</p></td>
+<td><p>Sent by the server to
+indicate that it is
+force-closing a pool.</p></td>
+<td><p>None. This event is only sent to peers in the
+relevant pool.</p></td>
+</tr>
+<tr class="row-odd"><td><p>rtc:describe</p></td>
+<td><p>Client</p></td>
+<td><p>Sent by the server to
+indicate that a peer’s
+description has changed.</p></td>
+<td><ul class="simple">
+<li><p>description: The JSON description of the peer.</p></li>
+<li><p>id: The unique ID of the peer.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>rtc:error</p></td>
+<td><p>Client</p></td>
+<td><p>Indicates invalid data
+was sent by the client.</p></td>
+<td><ul class="simple">
+<li><p>message: The error message.</p></li>
+<li><p>reason: A developer-friendly error reason.</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the rtc:describe event has nothing to do with the SDP offers/answers, but rather an extra convenience added
+in this protocol to make identification and description of peers easier for developers. For more information, see
+<a class="reference internal" href="concepts.html#descriptions"><span class="std std-ref">Descriptions</span></a>.</p>
+</section>
+<section id="differences-from-v1">
+<h1>Differences from v1<a class="headerlink" href="#differences-from-v1" title="Permalink to this headline"></a></h1>
+<p>ssp-v1 had a few glaring differences (yes, that is a WebRTC pun). For one, there were two separate events for sending
+SDP descriptions, one for offers and one for answers. Originally, offers could be sent in bulk (multiple offers to
+different peers in one event), but as the architecture improved, this was abandoned, and the event ended up being used
+to only send a single event. This separation in events made perfect negotiation difficult, and this is a significant
+reason why v2 was developed. Replacing the two events with a single SDP event made perfect negotiation not only feasible,
+but rather simple. In very early versions of RTCPool, media was handled manually, and instead of an rtc:peer event,
+there was an event called rtc:request_offers that served two purposes. One was the same as rtc:peer, that is, to notify
+other peers of a newly joined peer. The other was to request SDP offers for any media that the specified peer had. This
+approach was clunky and completely ignored the brilliant <code class="docutils literal notranslate"><span class="pre">negotiationneeded</span></code> event that I should have used all along.
+As the architecture evolved, this event ended up no longer being used for requesting media offers, but rather only to
+notify peers of newly joined peers. Thus, in v2, I renamed the event to <code class="docutils literal notranslate"><span class="pre">rtc:peers</span></code> for clarity.</p>
+<p>Another minor difference from ssp-v1 is that some events that have <code class="docutils literal notranslate"><span class="pre">id</span></code> fields instead had <code class="docutils literal notranslate"><span class="pre">uid</span></code> fields. I saw no need
+for the <code class="docutils literal notranslate"><span class="pre">u</span></code>, so I scrapped it for clarity. RTCPool 3.0.0 still uses <code class="docutils literal notranslate"><span class="pre">uid</span></code>, but 3.0.1 will patch this. For compatibility,
+PyRTC 2.0.0 sends both <code class="docutils literal notranslate"><span class="pre">uid</span></code> and <code class="docutils literal notranslate"><span class="pre">id</span></code> fields so as to be compatible with all versions of RTCPool 3.0.0+.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="concepts.html" class="btn btn-neutral float-left" title="Concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/index.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Isaac Dorenkamp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

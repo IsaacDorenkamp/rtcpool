@@ -10,7 +10,7 @@ Welcome to RTCPool's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   concepts
+   intro/index
    api/index
 
 

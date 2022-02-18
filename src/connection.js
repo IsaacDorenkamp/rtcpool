@@ -9,6 +9,10 @@
 class ManagedConnection {
 	static EVENTS = ["datachannel", "track"];
 
+	#conn;
+	#id;
+	#descriptions;
+
 	/**
 	 * Creates a ManagedConnection
 	 * for the given RTCPeerConnection.
@@ -24,9 +28,9 @@ class ManagedConnection {
 	 *   the connection's description.
 	 */
 	constructor(conn, id, descs) {
-		this._conn = conn;
-		this._id = id;
-		this._description = descs;
+		this.#conn = conn;
+		this.#id = id;
+		this.#descriptions = descs;
 	}
 
 	/**
@@ -40,7 +44,7 @@ class ManagedConnection {
 		if (!ManagedConnection.EVENTS.includes(evt_type)) {
 			throw new Error(`Event type '${evt_type}' is not handled by ManagedConnection.`);
 		} else {
-			this._conn.addEventListener(evt_type, ...args)
+			this.#conn.addEventListener(evt_type, ...args)
 		}
 	}
 
@@ -48,7 +52,7 @@ class ManagedConnection {
 	 * A proxy for removing listeners from the managed connection.
 	 */
 	removeEventListener(...args) {
-		this._conn.removeEventListener(...args);
+		this.#conn.removeEventListener(...args);
 	}
 
 	/**
@@ -67,7 +71,7 @@ class ManagedConnection {
 	 * @return {Promise<RTCDataChannel> | RTCDataChannel} A promise resolving to the created channel, or the channel itself.
 	 */
 	dataChannel(label, options={}, raw=false) {
-		const channel = this._conn.createDataChannel(label, options);
+		const channel = this.#conn.createDataChannel(label, options);
 		if (raw) {
 			return channel;
 		} else {
@@ -81,21 +85,21 @@ class ManagedConnection {
 	 * A proxy for RTCPeerConnection.addTrack
 	 */
 	addTrack(track, ...streams) {
-		return this._conn.addTrack(track, ...streams);
+		return this.#conn.addTrack(track, ...streams);
 	}
 
 	/**
 	 * A proxy for RTCPeerConnection.removeTrack
 	 */
 	removeTrack(sender) {
-		this._conn.removeTrack(track);
+		this.#conn.removeTrack(track);
 	}
 
 	/**
 	 * The ID of the peer.
 	 */
 	get id() {
-		return this._id;
+		return this.#id;
 	}
 
 	/**
@@ -108,7 +112,7 @@ class ManagedConnection {
 	 * @type {Object}
 	 */
 	get description() {
-		return this._description[this._id];
+		return this.#descriptions[this.#id];
 	}
 }
 

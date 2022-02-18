@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pool How-To &mdash; RTCPool 1.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Transceivers" href="transceivers.html" />
+    <link rel="prev" title="Signalling Protocol - ssp" href="protocol.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> RTCPool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Understanding RTCPool</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol.html">Signalling Protocol - ssp</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Pool How-To</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#join">join</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#close">close</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stop">stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#peer">peer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#describe">describe</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transceivers.html">Transceivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="media.html">Managing Media</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTCPool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Understanding RTCPool</a> &raquo;</li>
+      <li>Pool How-To</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/intro/events.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pool-how-to">
+<h1>Pool How-To<a class="headerlink" href="#pool-how-to" title="Permalink to this headline"></a></h1>
+<p>While the API Reference is fairly thorough, it does not do much
+in the way of describing the important events dispatched to
+<a class="reference internal" href="../api/pool.html#Pool.events" title="Pool.events"><code class="xref js js-attr docutils literal notranslate"><span class="pre">Pool.events</span></code></a>. This section will describe what events are
+used, what data they receive, and so on. These events will be
+important if you want to make effective use of RTCPool, so be
+sure to make note of this content!</p>
+<section id="join">
+<h2>join<a class="headerlink" href="#join" title="Permalink to this headline"></a></h2>
+<p>This event is dispatched when the <a class="reference internal" href="../api/pool.html#Pool" title="Pool"><code class="xref js js-class docutils literal notranslate"><span class="pre">Pool()</span></code></a> has successfully
+connected to the pool on the server-side. Before this event is fired,
+no connections are available, and attempting to create media with the
+it will not work. If you wish to add media to a stream ASAP, wait until
+this event has been fired and then do so. For example, do this:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">const</span> <span class="nx">pool</span> <span class="o">=</span> <span class="ow">new</span> <span class="nx">rtcpool</span><span class="p">.</span><span class="nx">Pool</span><span class="p">({</span> <span class="cm">/* TURN/STUN config */</span> <span class="p">},</span> <span class="nx">signaller</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">media</span><span class="p">;</span>
+<span class="nx">pool</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="nx">onjoin</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">media</span> <span class="o">=</span> <span class="ow">new</span> <span class="nx">rtcpool</span><span class="p">.</span><span class="nx">media</span><span class="p">.</span><span class="nx">ManagedStream</span><span class="p">(</span><span class="nx">someMediaStream</span><span class="p">,</span> <span class="nx">pool</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>NOT this:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">const</span> <span class="nx">pool</span> <span class="o">=</span> <span class="ow">new</span> <span class="nx">rtcpool</span><span class="p">.</span><span class="nx">Pool</span><span class="p">({</span> <span class="cm">/* TURN/STUN config */</span> <span class="p">},</span> <span class="nx">signaller</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">media</span> <span class="o">=</span> <span class="ow">new</span> <span class="nx">rtcpool</span><span class="p">.</span><span class="nx">media</span><span class="p">.</span><span class="nx">ManagedStream</span><span class="p">(</span><span class="nx">someMediaStream</span><span class="p">,</span> <span class="nx">pool</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="close">
+<h2>close<a class="headerlink" href="#close" title="Permalink to this headline"></a></h2>
+<p>This event is dispatched when either another peer has closed, or when
+this peer has been instructed to close. This event <em>will</em> be fired even
+when <a class="reference internal" href="../api/pool.html#Pool.close" title="Pool.close"><code class="xref js js-meth docutils literal notranslate"><span class="pre">Pool.close()</span></code></a> is called, so be aware. The connection that was
+closed can be accessed in event.detail, as such:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">pool</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="nx">onclose</span> <span class="o">=</span> <span class="nx">event</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Closed connection to&quot;</span><span class="p">,</span> <span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>If event.detail is <code class="docutils literal notranslate"><span class="pre">null</span></code>, this indicates that <em>this</em> endpoint was the
+peer that was closed.</p>
+</section>
+<section id="stop">
+<h2>stop<a class="headerlink" href="#stop" title="Permalink to this headline"></a></h2>
+<p>Like the close event, but called when the server force-closes the pool.
+event.detail will always be null.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In RTCPool 3.0.0, assigning Pool.events.onstop will <em>NOT</em> work. This
+will be patched in version 3.0.1. For this event, it is best to simply
+use <code class="docutils literal notranslate"><span class="pre">addEventListener</span></code>.</p>
+</div>
+</section>
+<section id="peer">
+<h2>peer<a class="headerlink" href="#peer" title="Permalink to this headline"></a></h2>
+<p>This event is dispatched when a new peer has joined the pool. The
+<a class="reference internal" href="../api/connection.html#ManagedConnection" title="ManagedConnection"><code class="xref js js-class docutils literal notranslate"><span class="pre">ManagedConnection()</span></code></a> may be accessed in <code class="docutils literal notranslate"><span class="pre">event.detail.connection</span></code>.</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">pool</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="nx">onpeer</span> <span class="o">=</span> <span class="nx">event</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">peer</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">connection</span><span class="p">;</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;I have a new friend! His name is &quot;</span> <span class="o">+</span> <span class="nx">peer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="describe">
+<h2>describe<a class="headerlink" href="#describe" title="Permalink to this headline"></a></h2>
+<p>This event is dispatched when a peer’s description is changed.
+Both the peer’s <a class="reference internal" href="../api/connection.html#ManagedConnection" title="ManagedConnection"><code class="xref js js-class docutils literal notranslate"><span class="pre">ManagedConnection()</span></code></a> and the description object
+are included in <code class="docutils literal notranslate"><span class="pre">event.detail</span></code>, as <code class="docutils literal notranslate"><span class="pre">event.detail.connection</span></code> and
+<code class="docutils literal notranslate"><span class="pre">event.detail.description</span></code> respectively. Example:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">pool</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="nx">ondescribe</span> <span class="o">=</span> <span class="nx">event</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="p">{</span> <span class="nx">connection</span><span class="p">,</span> <span class="nx">description</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">detail</span><span class="p">;</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;My friend &quot;</span> <span class="o">+</span> <span class="nx">connection</span><span class="p">.</span><span class="nx">id</span> <span class="o">+</span> <span class="s2">&quot; got a car. It is a &quot;</span> <span class="o">+</span> <span class="nx">description</span><span class="p">.</span><span class="nx">car</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Recall that descriptions are arbitrary, so do not depend on data that might
+not be present. It is up to the developer how descriptions will be used and
+what information they will contain.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="protocol.html" class="btn btn-neutral float-left" title="Signalling Protocol - ssp" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="transceivers.html" class="btn btn-neutral float-right" title="Transceivers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Isaac Dorenkamp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

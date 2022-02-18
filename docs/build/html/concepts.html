@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API Reference" href="api/index.html" />
+    <link rel="next" title="Signalling Protocol" href="protocol.html" />
     <link rel="prev" title="Welcome to RTCPool’s documentation!" href="index.html" /> 
 </head>
 
@@ -45,8 +45,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#descriptions">Descriptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#signalling">Signalling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#perfect-negotiation">Perfect Negotiation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#managed-connection">Managed Connection</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html">Signalling Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocol.html#differences-from-v1">Differences from v1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
 </ul>
 
@@ -90,7 +93,7 @@ of their peers and know who to send offers to when appropriate. A
 single pool might be a video chat room, for instance.</p>
 </section>
 <section id="descriptions">
-<h2>Descriptions<a class="headerlink" href="#descriptions" title="Permalink to this headline"></a></h2>
+<span id="id1"></span><h2>Descriptions<a class="headerlink" href="#descriptions" title="Permalink to this headline"></a></h2>
 <p>RTCPool implements a system whereby connections can be associated
 with descriptions - arbitrary JSON objects which can be used to
 provide further information about the endpoint. Descriptions are
@@ -103,57 +106,16 @@ an endpoint’s description with <code class="xref js js-meth docutils literal n
 <p>A signalling channel is simply an object that sends and receives
 RTC negotiation messages. How it sends them is unimportant, but
 they are sent via a <code class="docutils literal notranslate"><span class="pre">send(message_type,</span> <span class="pre">message_data)</span></code> method.
-Likewise, how it receives them is unimportant. A signalling class
-should be a subclass of <code class="docutils literal notranslate"><span class="pre">EventTarget</span></code>, and when it receives an
-event from the server, it dispatches an event to itself.
-The event names are mapped accordingly:</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 45%" />
-<col style="width: 55%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Received From Server</p></th>
-<th class="head"><p>Type of event dispatched</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>rtc:joined</p></td>
-<td><p>join</p></td>
-</tr>
-<tr class="row-odd"><td><p>rtc:describe</p></td>
-<td><p>describe</p></td>
-</tr>
-<tr class="row-even"><td><p>rtc:request_offers</p></td>
-<td><p>request</p></td>
-</tr>
-<tr class="row-odd"><td><p>rtc:offer</p></td>
-<td><p>offer</p></td>
-</tr>
-<tr class="row-even"><td><p>rtc:answer</p></td>
-<td><p>answer</p></td>
-</tr>
-<tr class="row-odd"><td><p>rtc:close</p></td>
-<td><p>close</p></td>
-</tr>
-<tr class="row-even"><td><p>rtc:candidate</p></td>
-<td><p>candidate</p></td>
-</tr>
-<tr class="row-odd"><td><p>rtc:stop</p></td>
-<td><p>stop</p></td>
-</tr>
-</tbody>
-</table>
-<p>RTCPool has built in support for raw WebSocket signalling and
-socket.io signalling, but you can build your own signalling class
-by creating a class which functions as described above.</p>
-<p>To simplify things, the <a class="reference internal" href="api/signalling.html#signalling" title="signalling"><code class="xref js js-class docutils literal notranslate"><span class="pre">signalling()</span></code></a> automatically handles
-the event mapping. All you must do is extend <a class="reference internal" href="api/signalling.html#transceiver" title="transceiver"><code class="xref js js-class docutils literal notranslate"><span class="pre">transceiver()</span></code></a>,
-and then you can create a signalling instance with something like
-the below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">const</span> <span class="n">signalling</span> <span class="o">=</span> <span class="n">new</span> <span class="n">rtcpool</span><span class="o">.</span><span class="n">signalling</span><span class="p">(</span><span class="n">new</span> <span class="n">MyTransceiver</span><span class="p">());</span>
-</pre></div>
-</div>
+Likewise, how it receives them is unimportant. RTCPool has built-in
+support for socket.io and raw WebSockets as signalling channels, but
+you may implement your own by extending <a class="reference internal" href="api/signalling.html#transceiver" title="transceiver"><code class="xref js js-class docutils literal notranslate"><span class="pre">transceiver()</span></code></a> and ensuring
+the following:</p>
+<ul class="simple">
+<li><p>Implement a <code class="docutils literal notranslate"><span class="pre">send</span></code> method that accepts a message type and data as a JSON object.</p></li>
+<li><p>Implement code that passively listens for data from the signalling channel,
+and when an event is available, dispatches the event to <code class="docutils literal notranslate"><span class="pre">this</span></code> (since
+<a class="reference internal" href="api/signalling.html#transceiver" title="transceiver"><code class="xref js js-class docutils literal notranslate"><span class="pre">transceiver()</span></code></a> extends EventTarget)</p></li>
+</ul>
 </section>
 <section id="perfect-negotiation">
 <h2>Perfect Negotiation<a class="headerlink" href="#perfect-negotiation" title="Permalink to this headline"></a></h2>
@@ -165,13 +127,17 @@ not fail to be established (of course, assuming that you have a functional
 TURN/STUN configuration and signalling channel to boot!).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>While versions before 1.4.0 claimed to implement perfect negotiation,
-rigorous tests later showed otherwise. Now, those rigorous tests
-have been shown to pass flawlessly, and as long as the TURN/STUN
-configuration are valid and the signalling channel is reliable,
-negotiation and re-negotiation should be managed properly 100%
-of the time for versions 1.4.0+.</p>
+<p>All versions pre-3.0.0 have some negotiation failure cases.
+Each successive version improved upon the shortcomings of the
+previous one, but true perfect negotiation was not achieved until
+version 3.0.0 with a complete rewrite of the internal negotiation
+process.</p>
 </div>
+</section>
+<section id="managed-connection">
+<h2>Managed Connection<a class="headerlink" href="#managed-connection" title="Permalink to this headline"></a></h2>
+<p>The primary purpose of RTCPool is to simplify the use of the WebRTC API.
+As such, negotiation is completely abstracted away and handled internally.</p>
 </section>
 </section>
 
@@ -180,7 +146,7 @@ of the time for versions 1.4.0+.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to RTCPool’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="api/index.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="protocol.html" class="btn btn-neutral float-right" title="Signalling Protocol" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

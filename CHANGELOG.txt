@@ -1,3 +1,10 @@
+# 3.0.0: February 17, 2022
+- Refactored project and redesigned
+  negotiation process to be 100% perfect.
+  Previous versions came close but never
+  to total accuracy.
+- Updated to SDP Signalling Protocol V2
+
 # 2.1.10: February 16, 2022
 - Fixed ManagedStream constructor bug wherein
   this._streams[conn.id] was assigned to a new

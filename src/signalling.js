@@ -1,9 +1,8 @@
 const listeners = {
 	'rtc:joined': 'join',
 	'rtc:describe': 'describe',
-	'rtc:request_offers': 'request',
-	'rtc:offer': 'offer',
-	'rtc:answer': 'answer',
+	'rtc:peer': 'peer',
+	'rtc:sdp': 'sdp',
 	'rtc:close': 'close',
 	'rtc:candidate': 'icecandidate',
 	'rtc:stop': 'stop'
