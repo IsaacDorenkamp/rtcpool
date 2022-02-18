@@ -1,7 +1,10 @@
 "use strict";
 
+var pool = require('./pool');
+
 module.exports = {
-  'Pool': require('./pool').Pool,
+  'pool': pool,
+  'Pool': pool.Pool,
   'signalling': require('./signalling'),
   'media': require('./media')
 };

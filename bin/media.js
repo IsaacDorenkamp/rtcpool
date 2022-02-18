@@ -183,6 +183,8 @@ var ManagedStream = /*#__PURE__*/function (_EventTarget) {
      * If kind is null, all tracks will be muted.
      * If kind is 'video' or 'audio', only tracks
      * of the corresponding kind will be muted.
+     * 
+     * @param {string} kind - The kind of track to mute.
      */
 
   }, {
@@ -236,6 +238,8 @@ var ManagedStream = /*#__PURE__*/function (_EventTarget) {
      * If kind is null, all tracks will be unmuted.
      * If kind is 'video' or 'audio', only tracks
      * of the corresponding kind will be unmuted.
+     * 
+     * @param {string} kind - The kind of track to unmute.
      */
 
   }, {
@@ -293,6 +297,8 @@ var ManagedStream = /*#__PURE__*/function (_EventTarget) {
      * Checks if a subset of tracks are muted. If kind is null, this checks if all tracks are muted.
      * Otherwise, checks if all tracks of the specified kind ('video' or 'audio') are muted.
      * 
+     * @param {string} kind - The kind of track to check the muted state of.
+     * 
      * @return {Boolean} Whether the specified kind of track is muted (all tracks if kind is null).
      */
 
@@ -312,7 +318,7 @@ var ManagedStream = /*#__PURE__*/function (_EventTarget) {
     /**
      * Check if this ManagedStream has a MediaStream with the specified ID.
      * 
-     * @param {string} The ID to check for.
+     * @param {string} id - The ID to check for.
      * 
      * @return {Boolean} true if the stream is found, false otherwise
      */

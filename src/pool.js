@@ -58,7 +58,7 @@ class Pool {
 		this.#signals.onstop = this.close.bind(this, 'stop');
 		this.#signals.ondescribe = this.#describe.bind(this);
 
-		this.events = util.withon(new EventTarget(), ['join', 'close', 'describe', 'peer']);
+		this.events = util.withon(new EventTarget(), ['join', 'stop', 'close', 'describe', 'peer']);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Pool {
 	}
 
 	#describe(data) {
-		const conn_id = data.uid;
+		const conn_id = data.id;
 		const conn = this.#connections[conn_id].managed;
 		this.#descriptions[conn_id] = data.description;
 		this.events.dispatchEvent(new CustomEvent('describe', {
@@ -193,14 +193,14 @@ class Pool {
 	}
 
 	#onclose(close_req) {
-		const conn = this.#connections[close_req.uid];
+		const conn = this.#connections[close_req.id];
 		conn.raw.close();
 		this.events.dispatchEvent(new CustomEvent('close', {
 			'detail': conn.managed
 		}));
 
-		delete this.#connections[close_req.uid];
-		delete this.#descriptions[close_req.uid];
+		delete this.#connections[close_req.id];
+		delete this.#descriptions[close_req.id];
 	}
 
 	async #onicecandidate(data) {

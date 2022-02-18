@@ -166,7 +166,7 @@ var Pool = /*#__PURE__*/function () {
     (0, _classPrivateFieldGet2["default"])(this, _signals).onjoin = _classPrivateMethodGet(this, _onjoin, _onjoin2).bind(this);
     (0, _classPrivateFieldGet2["default"])(this, _signals).onstop = this.close.bind(this, 'stop');
     (0, _classPrivateFieldGet2["default"])(this, _signals).ondescribe = _classPrivateMethodGet(this, _describe, _describe2).bind(this);
-    this.events = util.withon(new EventTarget(), ['join', 'close', 'describe', 'peer']);
+    this.events = util.withon(new EventTarget(), ['join', 'stop', 'close', 'describe', 'peer']);
   }
   /**
    * Sends a 'join' message to the signalling server to join a pool.
@@ -273,7 +273,7 @@ var Pool = /*#__PURE__*/function () {
 }();
 
 function _describe2(data) {
-  var conn_id = data.uid;
+  var conn_id = data.id;
   var conn = (0, _classPrivateFieldGet2["default"])(this, _connections)[conn_id].managed;
   (0, _classPrivateFieldGet2["default"])(this, _descriptions)[conn_id] = data.description;
   this.events.dispatchEvent(new CustomEvent('describe', {
@@ -404,13 +404,13 @@ function _onpeer2(data) {
 }
 
 function _onclose2(close_req) {
-  var conn = (0, _classPrivateFieldGet2["default"])(this, _connections)[close_req.uid];
+  var conn = (0, _classPrivateFieldGet2["default"])(this, _connections)[close_req.id];
   conn.raw.close();
   this.events.dispatchEvent(new CustomEvent('close', {
     'detail': conn.managed
   }));
-  delete (0, _classPrivateFieldGet2["default"])(this, _connections)[close_req.uid];
-  delete (0, _classPrivateFieldGet2["default"])(this, _descriptions)[close_req.uid];
+  delete (0, _classPrivateFieldGet2["default"])(this, _connections)[close_req.id];
+  delete (0, _classPrivateFieldGet2["default"])(this, _descriptions)[close_req.id];
 }
 
 function _onicecandidate2(_x) {
