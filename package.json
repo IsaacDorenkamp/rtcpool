@@ -1,6 +1,6 @@
 {
   "name": "rtcpool",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A library to make managing multiple WebRTC connections exponentially easier.",
   "main": "bin/index.js",
   "scripts": {
