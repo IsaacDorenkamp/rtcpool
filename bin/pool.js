@@ -278,7 +278,7 @@ function _describe2(data) {
   (0, _classPrivateFieldGet2["default"])(this, _descriptions)[conn_id] = data.description;
   this.events.dispatchEvent(new CustomEvent('describe', {
     detail: {
-      connection: managed,
+      connection: conn,
       description: data.description
     }
   }));

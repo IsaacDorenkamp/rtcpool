@@ -83,7 +83,7 @@ class Pool {
 		this.#descriptions[conn_id] = data.description;
 		this.events.dispatchEvent(new CustomEvent('describe', {
 			detail: {
-				connection: managed,
+				connection: conn,
 				description: data.description
 			}
 		}));
